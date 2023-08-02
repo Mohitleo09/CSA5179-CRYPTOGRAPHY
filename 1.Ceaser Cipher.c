@@ -1,7 +1,7 @@
 #include <stdio.h>
 int main()
 {
-   int i, x, key;
+   int i, key;
    char str[20];
    printf("\nPlease enter a string:\t");
    gets(str);
