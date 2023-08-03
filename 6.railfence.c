@@ -1,52 +1,40 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-main()
+char *plainTextToCipherText(char plainText[],int n)
 {
- int i,j,len,rails,count,code[100][1000];
-    char str[1000];
-    printf("Enter Message\n");
-    gets(str);
-    len=strlen(str);
- printf("Enter number of rails\n");
- scanf("%d",&rails);
- for(i=0;i<rails;i++)
+    int i,j,counter,limit,index=0,len;
+    char *cipherText;
+    len=strlen(plainText);
+    cipherText=(char*)malloc(sizeof(char)*(len+1));
+    for(i=0;i<n;i++)
  {
-  for(j=0;j<len;j++)
+  counter=0;
+  for(j=i;j<len;j+=limit)
   {
-   code[i][j]=0;
+   cipherText[index++]=plainText[j];
+   if(i==0 || i==n-1)
+       limit=2*n-2;
+   else if(counter%2==0)
+    limit=2*(n-i-1);
+   else
+    limit=2*i;
+   if(limit<=0)
+       break;
+   counter++;
   }
  }
-count=0;
-j=0;
-while(j<len)
-{
-if(count%2==0)
-{
- for(i=0;i<rails;i++)
- {
-  code[i][j]=(int)str[j]; 
-  j++;
- }
+ cipherText[index]='\0';
+ return cipherText;
 }
-else
+int main()
 {
- for(i=rails-2;i>0;i--)
- {
-  code[i][j]=(int)str[j];
- j++;
- }  
-} 
-count++;
-}
-for(i=0;i<rails;i++)
-{
- for(j=0;j<len;j++)
- {
-  if(code[i][j]!=0)
-  printf("%c",code[i][j]);
- }
- 
-}
-printf("\n");
+ int n;
+ char plainText[100];
+ printf("Enter the plain text : ");
+ scanf("%s",plainText);
+ printf("Enter the value of n : ");
+ scanf("%d",&n);
+    printf("%s\n",plainTextToCipherText(plainText,n)); 
+ return 0;
 }
