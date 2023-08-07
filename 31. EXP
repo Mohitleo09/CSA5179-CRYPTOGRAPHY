@@ -1,0 +1,88 @@
+#include <stdio.h>
+
+// Function to apply the block cipher to a block of all 0 bits
+void applyBlockCipher(unsigned char *block, int blockSize) {
+    // Replace this with your implementation of the block cipher
+    // For this example, we will just print the block in hexadecimal format
+    printf("Block Cipher Output: ");
+    for (int i = 0; i < blockSize / 8; i++) {
+        printf("%02X ", block[i]);
+    }
+    printf("\n");
+}
+
+// Function to perform left shift by one bit on the given block
+void leftShiftOneBit(unsigned char *block, int blockSize) {
+    int carry = 0;
+    for (int i = blockSize / 8 - 1; i >= 0; i--) {
+        int newCarry = block[i] & 0x80 ? 1 : 0;
+        block[i] = (block[i] << 1) | carry;
+        carry = newCarry;
+    }
+}
+
+// Function to perform conditional XOR with a constant based on the block size
+void conditionalXOR(unsigned char *block, int blockSize) {
+    if (blockSize == 64) {
+        // Constant for 64-bit block size
+        unsigned char constant[8] = {0x1B, 0x1B, 0x1B, 0x1B, 0x1B, 0x1B, 0x1B, 0x1B};
+        for (int i = 0; i < blockSize / 8; i++) {
+            block[i] ^= constant[i];
+        }
+    } else if (blockSize == 128) {
+        // Constant for 128-bit block size
+        unsigned char constant[16] = {0x87, 0x87, 0x87, 0x87, 0x87, 0x87, 0x87, 0x87,
+                                     0x87, 0x87, 0x87, 0x87, 0x87, 0x87, 0x87, 0x87};
+        for (int i = 0; i < blockSize / 8; i++) {
+            block[i] ^= constant[i];
+        }
+    }
+}
+
+int main() {
+    // Block sizes in bits
+    int blockSize64 = 64;
+    int blockSize128 = 128;
+
+    // Subkey generation for 64-bit block size
+    unsigned char subkey64[blockSize64 / 8] = {0};
+    applyBlockCipher(subkey64, blockSize64);
+    leftShiftOneBit(subkey64, blockSize64);
+    conditionalXOR(subkey64, blockSize64);
+    printf("Subkey 1 (64-bit): ");
+    for (int i = 0; i < blockSize64 / 8; i++) {
+        printf("%02X ", subkey64[i]);
+    }
+    printf("\n");
+
+    // Subkey generation for 128-bit block size
+    unsigned char subkey128[blockSize128 / 8] = {0};
+    applyBlockCipher(subkey128, blockSize128);
+    leftShiftOneBit(subkey128, blockSize128);
+    conditionalXOR(subkey128, blockSize128);
+    printf("Subkey 1 (128-bit): ");
+    for (int i = 0; i < blockSize128 / 8; i++) {
+        printf("%02X ", subkey128[i]);
+    }
+    printf("\n");
+
+    // Generate the second subkey using the first subkey
+    leftShiftOneBit(subkey64, blockSize64);
+    conditionalXOR(subkey64, blockSize64);
+    printf("Subkey 2 (64-bit): ");
+    for (int i = 0; i < blockSize64 / 8; i++) {
+        printf("%02X ", subkey64[i]);
+    }
+    printf("\n");
+
+    // Generate the second subkey using the first subkey
+    leftShiftOneBit(subkey128, blockSize128);
+    conditionalXOR(subkey128, blockSize128);
+    printf("Subkey 2 (128-bit): ");
+    for (int i = 0; i < blockSize128 / 8; i++) {
+        printf("%02X ", subkey128[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
