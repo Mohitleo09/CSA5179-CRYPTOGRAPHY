@@ -1,0 +1,90 @@
+#include <stdio.h>
+
+// S-DES Function Prototypes
+unsigned char s_des_encrypt(unsigned char plaintext, unsigned char key);
+unsigned char s_des_decrypt(unsigned char ciphertext, unsigned char key);
+
+// CBC Encryption and Decryption Prototypes
+void cbc_encrypt(const unsigned char* plaintext, unsigned char* ciphertext, const unsigned char* key, const unsigned char* iv, int length);
+void cbc_decrypt(const unsigned char* ciphertext, unsigned char* plaintext, const unsigned char* key, const unsigned char* iv, int length);
+
+// S-DES Key
+const unsigned char s_des_key = 0x3D; // Binary Key: 01111 11101
+
+// Initialization Vector (IV)
+const unsigned char iv = 0xAA; // Binary IV: 1010 1010
+
+int main() {
+    unsigned char plaintext[] = { 0x01, 0x23 }; // Binary Plaintext: 0000 0001 0010 0011
+    unsigned char ciphertext[sizeof(plaintext)];
+
+    printf("CBC Encryption Test\n");
+    cbc_encrypt(plaintext, ciphertext, &s_des_key, &iv, sizeof(plaintext));
+    printf("Ciphertext: ");
+    for (int i = 0; i < sizeof(ciphertext); i++) {
+        printf("%x ", ciphertext[i]);
+    }
+    printf("\n");
+
+    unsigned char decrypted[sizeof(plaintext)];
+    printf("\nCBC Decryption Test\n");
+    cbc_decrypt(ciphertext, decrypted, &s_des_key, &iv, sizeof(ciphertext));
+    printf("Decrypted Plaintext: ");
+    for (int i = 0; i < sizeof(decrypted); i++) {
+        printf("%x ", decrypted[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+// S-DES Encryption Function
+unsigned char s_des_encrypt(unsigned char plaintext, unsigned char key) {
+    // S-DES Encryption Algorithm
+    // Implement your S-DES encryption code here
+    // ...
+    // Return the ciphertext
+}
+
+// S-DES Decryption Function
+unsigned char s_des_decrypt(unsigned char ciphertext, unsigned char key) {
+    // S-DES Decryption Algorithm
+    // Implement your S-DES decryption code here
+    // ...
+    // Return the plaintext
+}
+
+// CBC Encryption Function
+void cbc_encrypt(const unsigned char* plaintext, unsigned char* ciphertext, const unsigned char* key, const unsigned char* iv, int length) {
+    unsigned char previous_ciphertext = *iv; // Initialize the previous ciphertext with the IV
+
+    for (int i = 0; i < length; i++) {
+        // XOR the plaintext block with the previous ciphertext block
+        unsigned char block = plaintext[i] ^ previous_ciphertext;
+
+        // Encrypt the XORed block using S-DES
+        unsigned char encrypted_block = s_des_encrypt(block, *key);
+
+        // Update the previous ciphertext with the encrypted block for the next iteration
+        previous_ciphertext = encrypted_block;
+
+        // Store the ciphertext block
+        ciphertext[i] = encrypted_block;
+    }
+}
+
+// CBC Decryption Function
+void cbc_decrypt(const unsigned char* ciphertext, unsigned char* plaintext, const unsigned char* key, const unsigned char* iv, int length) {
+    unsigned char previous_ciphertext = *iv; // Initialize the previous ciphertext with the IV
+
+    for (int i = 0; i < length; i++) {
+        // Decrypt the ciphertext block using S-DES
+        unsigned char decrypted_block = s_des_decrypt(ciphertext[i], *key);
+
+        // XOR the decrypted block with the previous ciphertext block to obtain the plaintext block
+        plaintext[i] = decrypted_block ^ previous_ciphertext;
+
+        // Update the previous ciphertext with the current ciphertext for the next iteration
+        previous_ciphertext = ciphertext[i];
+    }
+}
