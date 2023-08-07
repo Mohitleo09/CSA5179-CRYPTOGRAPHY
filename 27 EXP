@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
-// Function to calculate the modular exponentiation (used for encryption and decryption)
 long long mod_pow(long long base, long long exp, long long modulus) {
     long long result = 1;
     while (exp > 0) {
