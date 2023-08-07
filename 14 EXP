@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to perform Hill Cipher Encryption
+void encrypt(char message[], int keyMatrix[][2]) {
+    int i, j, k, messageLen = strlen(message);
+    int cipherMatrix[messageLen][1];
+
+    for (i = 0; i < messageLen; i++) {
+        // Convert each letter to its corresponding number (A=0, B=1, ..., Z=25)
+        cipherMatrix[i][0] = message[i] - 'a';
+    }
+
+    // Perform matrix multiplication
+    for (i = 0; i < messageLen; i += 2) {
+        for (j = 0; j < 1; j++) {
+            cipherMatrix[i][j] = (keyMatrix[0][0] * cipherMatrix[i][j] + keyMatrix[0][1] * cipherMatrix[i + 1][j]) % 26;
+            cipherMatrix[i + 1][j] = (keyMatrix[1][0] * cipherMatrix[i][j] + keyMatrix[1][1] * cipherMatrix[i + 1][j]) % 26;
+        }
+    }
+
+    // Convert the numbers back to letters
+    printf("Ciphertext: ");
+    for (i = 0; i < messageLen; i++) {
+        printf("%c", cipherMatrix[i][0] + 'a');
+    }
+    printf("\n");
+}
+
+// Function to find the modulo inverse of a number (used for decryption)
+int findModInverse(int num) {
+    int x;
+    for (x = 1; x < 26; x++) {
+        if ((num * x) % 26 == 1) {
+            return x;
+        }
+    }
+    return -1; // Error: inverse does not exist
+}
+
+// Function to perform Hill Cipher Decryption
+void decrypt(char ciphertext[], int keyMatrix[][2]) {
+    int i, j, k, ciphertextLen = strlen(ciphertext);
+    int inverseMatrix[2][2], det, detInverse;
+    int decipherMatrix[ciphertextLen][1];
+
+    // Calculate the determinant of the key matrix
+    det = (keyMatrix[0][0] * keyMatrix[1][1] - keyMatrix[0][1] * keyMatrix[1][0]) % 26;
+    if (det < 0) det += 26;
+
+    // Find the modulo inverse of the determinant
+    detInverse = findModInverse(det);
+
+    // Calculate the inverse key matrix
+    inverseMatrix[0][0] = keyMatrix[1][1];
+    inverseMatrix[0][1] = -keyMatrix[0][1];
+    inverseMatrix[1][0] = -keyMatrix[1][0];
+    inverseMatrix[1][1] = keyMatrix[0][0];
+
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            inverseMatrix[i][j] = (inverseMatrix[i][j] * detInverse) % 26;
+            if (inverseMatrix[i][j] < 0) inverseMatrix[i][j] += 26;
+        }
+    }
+
+    for (i = 0; i < ciphertextLen; i++) {
+        decipherMatrix[i][0] = ciphertext[i] - 'a';
+    }
+
+    // Perform matrix multiplication with the inverse key matrix
+    for (i = 0; i < ciphertextLen; i += 2) {
+        for (j = 0; j < 1; j++) {
+            decipherMatrix[i][j] = (inverseMatrix[0][0] * decipherMatrix[i][j] + inverseMatrix[0][1] * decipherMatrix[i + 1][j]) % 26;
+            decipherMatrix[i + 1][j] = (inverseMatrix[1][0] * decipherMatrix[i][j] + inverseMatrix[1][1] * decipherMatrix[i + 1][j]) % 26;
+        }
+    }
+
+    // Convert the numbers back to letters
+    printf("Decrypted Plaintext: ");
+    for (i = 0; i < ciphertextLen; i++) {
+        printf("%c", decipherMatrix[i][0] + 'a');
+    }
+    printf("\n");
+}
+
+int main() {
+    char message[] = "meetmeattheusualplaceattenratherthaneightoclock";
+    int keyMatrix[2][2] = {{9, 4}, {5, 7}};
+
+    // Make the message lowercase
+    for (int i = 0; message[i]; i++) {
+        message[i] = tolower(message[i]);
+    }
+
+    printf("Original Message: %s\n", message);
+
+    // Encrypt the message
+    encrypt(message, keyMatrix);
+
+    // Decrypt the ciphertext
+    char ciphertext[] = "falsxhwvxqwedrcajhzimvxfaohomtucjkhrbd";
+    decrypt(ciphertext, keyMatrix);
+
+    return 0;
+}
