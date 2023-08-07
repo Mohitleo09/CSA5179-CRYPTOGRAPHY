@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <openssl/des.h>
-
-// Print bytes in hexadecimal format
 void printHex(const unsigned char* buffer, size_t length) {
     for (size_t i = 0; i < length; i++) {
         printf("%02x", buffer[i]);
