@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// Function to calculate the modular exponentiation (used for encryption and decryption)
+long long mod_pow(long long base, long long exp, long long modulus) {
+    long long result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+        base = (base * base) % modulus;
+        exp /= 2;
+    }
+    return result;
+}
+
+// Function to perform RSA encryption
+long long encrypt(long long message, long long e, long long n) {
+    return mod_pow(message, e, n);
+}
+
+// Function to perform RSA decryption
+long long decrypt(long long encrypted_msg, long long d, long long n) {
+    return mod_pow(encrypted_msg, d, n);
+}
+
+int main() {
+    long long p, q, n, phi, e, d, message, encrypted_msg, decrypted_msg;
+
+    // Choose two large prime numbers p and q
+    p = 997; // Example prime number (replace with a large prime)
+    q = 983; // Example prime number (replace with a large prime)
+
+    // Calculate n (modulus) and phi (Euler's totient function)
+    n = p * q;
+    phi = (p - 1) * (q - 1);
+
+    // Choose a large public exponent e
+    e = 65537; // Example public exponent (replace with a large prime)
+
+    // Calculate the private exponent d (private key)
+    d = 1;
+    while (((d * e) % phi) != 1) {
+        d++;
+    }
+
+    printf("Public key (e, n): (%lld, %lld)\n", e, n);
+    printf("Private key (d, n): (%lld, %lld)\n", d, n);
+
+    // Alice's message represented as an integer between 0 and 25
+    message = 15; // Example message (replace with your desired message)
+
+    // Encryption
+    encrypted_msg = encrypt(message, e, n);
+    printf("Encrypted message: %lld\n", encrypted_msg);
+
+    // Decryption
+    decrypted_msg = decrypt(encrypted_msg, d, n);
+    printf("Decrypted message: %lld\n", decrypted_msg);
+
+    return 0;
+}
